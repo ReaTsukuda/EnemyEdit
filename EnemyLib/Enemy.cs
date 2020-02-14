@@ -88,9 +88,9 @@ namespace EnemyLib
     public Drop SecondDrop { get; }
 
     /// <summary>
-    /// The enemy's conditional drop.
+    /// The drop in the enemy's third drop slot.
     /// </summary>
-    public ConditionalDrop ConditionalDrop { get; }
+    public Drop ThirdDrop { get; }
   }
 
   /// <summary>
@@ -238,31 +238,26 @@ namespace EnemyLib
   }
 
   /// <summary>
-  /// A use item that the enemy can drop.
+  /// A drop that requires a condition to be fulfilled before it can drop.
   /// </summary>
   public class Drop : UseItem
   {
     /// <summary>
-    /// The chance for the item to drop when the enemy is killed.
+    /// The chance for the drop to be given.
     /// </summary>
     public int Chance { get; set; }
 
-    public Drop(Table names, int index) : base(names, index)
-    {
-    }
-  }
-
-  /// <summary>
-  /// A drop that requires a condition to be fulfilled before it can drop.
-  /// </summary>
-  public class ConditionalDrop : Drop
-  {
     /// <summary>
     /// The condition that must be fulfilled to trigger the conditional drop.
     /// </summary>
     public ConditionalDropFlags Condition { get; set; }
 
-    public ConditionalDrop(Table names, int index) : base(names, index)
+    /// <summary>
+    /// The argument for the condition flag.
+    /// </summary>
+    public int ConditionArgument { get; set; }
+
+    public Drop(Table names, int index) : base(names, index)
     {
     }
   }
@@ -272,6 +267,21 @@ namespace EnemyLib
   /// </summary>
   public enum ConditionalDropFlags
   {
+    /// <summary>
+    /// No specific condition must be fulfilled.
+    /// </summary>
+    NoCondition = 0x00,
+
+    /// <summary>
+    /// The enemy must be killed by an attack whose effective damage type is not cut, stab, or bash.
+    /// </summary>
+    NonPhysicalDamage = 0x02,
+
+    /// <summary>
+    /// The enemy must be killed by an attack whose effective damage type is not fire, ice, or volt.
+    /// </summary>
+    NonElementalDamage = 0x04,
+
     /// <summary>
     /// The enemy must be killed by an attack whose damage type includes cut.
     /// </summary>
@@ -363,9 +373,24 @@ namespace EnemyLib
     FullyBound = 0x30,
 
     /// <summary>
-    /// The enemy must be killed on the first turn.
+    /// The enemy must be killed by the turn provided as the flag argument.
     /// </summary>
-    FirstTurn = 0x32,
+    TimeLimit = 0x32,
+
+    /// <summary>
+    /// The enemy must be killed by a party that has an amount less than or equal to the flag argument.
+    /// </summary>
+    PartyCountLimit = 0x36,
+
+    /// <summary>
+    /// The enemy must be killed by a specific weapon, whose ID is specified as the flag argument.
+    /// </summary>
+    SpecificWeapon = 0x44,
+
+    /// <summary>
+    /// The enemy must be killed by a single attack that deals the flag argument multiplied by 100 as damage.
+    /// </summary>
+    SpecificDamage = 0x48,
 
     /// <summary>
     /// The enemy must be killed with an attack whose damage type includes cut, stab, or bash.
